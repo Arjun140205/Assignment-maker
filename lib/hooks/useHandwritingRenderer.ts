@@ -1,12 +1,13 @@
 /**
  * Custom hook for handwriting rendering with layout engine integration
- * Handles text edits and triggers layout recalculation
+ * Handles text edits and triggers layout recalculation with debouncing
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { HandwritingRenderer } from '@/lib/services/handwritingRenderer';
 import { Answer } from '@/lib/types/ai-service';
 import { CanvasPage, HandwrittenFont, PageStyle } from '@/lib/types/canvas';
+import { debounce } from '@/lib/utils/performance';
 
 interface UseHandwritingRendererOptions {
   answers: Answer[];
@@ -53,8 +54,8 @@ export function useHandwritingRenderer({
     };
   }, []);
 
-  // Recalculate layout
-  const recalculateLayout = useCallback(async () => {
+  // Recalculate layout (raw function)
+  const recalculateLayoutRaw = useCallback(async () => {
     if (!rendererRef.current || !font || answers.length === 0) {
       setPages([]);
       return;
@@ -85,6 +86,16 @@ export function useHandwritingRenderer({
     }
   }, [answers, font, color, pageStyle, onPagesUpdate]);
 
+  // Debounced version for automatic recalculation (300ms delay)
+  const debouncedRecalculate = useRef(
+    debounce((fn: () => Promise<void>) => fn(), 300)
+  );
+
+  // Public recalculate function (immediate, no debounce)
+  const recalculateLayout = useCallback(async () => {
+    await recalculateLayoutRaw();
+  }, [recalculateLayoutRaw]);
+
   // Estimate page count
   const estimatePageCount = useCallback(() => {
     if (!rendererRef.current || !font || answers.length === 0) {
@@ -94,10 +105,11 @@ export function useHandwritingRenderer({
     return rendererRef.current.estimatePageCount(answers, font);
   }, [answers, font]);
 
-  // Trigger layout recalculation when dependencies change
+  // Trigger debounced layout recalculation when dependencies change
+  // This prevents excessive re-renders during rapid text edits
   useEffect(() => {
-    recalculateLayout();
-  }, [recalculateLayout]);
+    debouncedRecalculate.current(recalculateLayoutRaw);
+  }, [recalculateLayoutRaw]);
 
   return {
     pages,
