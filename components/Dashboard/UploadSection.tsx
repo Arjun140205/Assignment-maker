@@ -183,8 +183,11 @@ export default function UploadSection({
     const content: ExtractedContent = {
       text: pastedText.trim(),
       metadata: {
+        fileName: 'Pasted text',
+        fileType: 'text/plain',
+        fileSize: pastedText.trim().length,
         pageCount: 1,
-        wordCount: pastedText.trim().split(/\s+/).length,
+        extractedAt: new Date(),
       },
     };
 
@@ -194,27 +197,27 @@ export default function UploadSection({
 
   return (
     <div className="w-full">
-      {/* Mode Toggle */}
-      <div className="flex gap-2 mb-4">
+      {/* Mode Toggle - Compact */}
+      <div className="flex gap-2 mb-3">
         <button
           onClick={() => setInputMode('upload')}
-          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
             inputMode === 'upload'
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          Upload File
+          📎 Upload File
         </button>
         <button
           onClick={() => setInputMode('paste')}
-          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-medium transition-colors ${
             inputMode === 'paste'
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          Paste Text
+          📝 Paste Text
         </button>
       </div>
 
@@ -222,7 +225,7 @@ export default function UploadSection({
         <div
           {...getRootProps()}
           className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
+            border-2 border-dashed rounded-lg p-4 text-center cursor-pointer
             transition-all duration-200 ease-in-out
             ${
               isDragActive
@@ -234,10 +237,10 @@ export default function UploadSection({
         >
           <input {...getInputProps()} />
           
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center justify-center gap-3">
             {/* Upload Icon */}
             <svg
-              className="w-12 h-12 text-gray-400"
+              className="w-8 h-8 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -251,23 +254,20 @@ export default function UploadSection({
             </svg>
 
             {/* Upload Text */}
-            <div>
+            <div className="text-left">
               {isDragActive ? (
-                <p className="text-lg font-medium text-blue-600">
+                <p className="text-sm font-medium text-blue-600">
                   Drop the file here
                 </p>
               ) : (
                 <>
-                  <p className="text-lg font-medium text-gray-700">
+                  <p className="text-sm font-medium text-gray-900">
                     {isProcessing
                       ? 'Processing file...'
-                      : 'Drag & drop a file here, or click to select'}
+                      : 'Drag & drop or click to upload'}
                   </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Supports PDF, DOCX, images (PNG, JPG), and text files
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Maximum file size: {MAX_FILE_SIZE / 1024 / 1024}MB
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    PDF, DOCX, images, or text files (max {MAX_FILE_SIZE / 1024 / 1024}MB)
                   </p>
                 </>
               )}
@@ -275,38 +275,38 @@ export default function UploadSection({
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
             placeholder="Paste your assignment questions here..."
-            className="w-full h-48 p-4 border-2 border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full h-32 p-3 border-2 border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 transition-colors text-gray-900"
           />
           <button
             onClick={handlePastedTextSubmit}
             disabled={!pastedText.trim()}
-            className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             Use This Text
           </button>
         </div>
       )}
 
-      {/* Progress Indicator */}
+      {/* Progress Indicator - Compact */}
       {uploadProgress && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
+        <div className="mt-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-900 truncate max-w-[70%]">
               {uploadProgress.fileName}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-xs text-gray-600">
               {getStageLabel(uploadProgress.stage)}
             </span>
           </div>
           
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-1.5">
             <div
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 uploadProgress.stage === UploadStage.ERROR
                   ? 'bg-red-500'
                   : uploadProgress.stage === UploadStage.COMPLETE
@@ -318,25 +318,24 @@ export default function UploadSection({
           </div>
 
           {uploadProgress.stage === UploadStage.COMPLETE && (
-            <p className="text-sm text-green-600 mt-2">
+            <p className="text-xs text-green-600 mt-1">
               ✓ File processed successfully
             </p>
           )}
           
           {uploadProgress.stage === UploadStage.ERROR && (
-            <p className="text-sm text-red-600 mt-2">
+            <p className="text-xs text-red-600 mt-1">
               ✗ Failed to process file
             </p>
           )}
         </div>
       )}
 
-      {/* Uploaded File Info */}
+      {/* Uploaded File Info - Compact */}
       {uploadedFile && !uploadProgress && (
-        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-800">
+        <div className="mt-2 px-3 py-2 bg-green-50 border border-green-200 rounded-md">
+          <p className="text-xs text-green-800">
             ✓ <span className="font-medium">{uploadedFile}</span> uploaded
-            successfully
           </p>
         </div>
       )}
