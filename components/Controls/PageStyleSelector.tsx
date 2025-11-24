@@ -45,17 +45,17 @@ export default function PageStyleSelector({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold mb-1">Page Style</h3>
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <h3 className="text-lg font-semibold mb-1 text-gray-900">Page Style</h3>
         <p className="text-sm text-gray-600">
           Choose the notebook page style for your assignment
         </p>
       </div>
 
       {/* Style Options */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 bg-white overflow-y-auto">
         <div className="grid grid-cols-1 gap-4">
           {pageStyles.map((style) => (
             <StyleOption
