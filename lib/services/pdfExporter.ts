@@ -4,7 +4,13 @@
  */
 
 import { jsPDF } from 'jspdf';
-import { CanvasPage, PageStyle, HandwrittenFont } from '@/lib/types/canvas';
+import { 
+  CanvasPage, 
+  PageStyle, 
+  HandwrittenFont, 
+  ExportError, 
+  ExportErrorCode 
+} from '@/lib/types/canvas';
 
 export interface ExportOptions {
   format?: 'a4' | 'letter';
@@ -119,7 +125,9 @@ export class PDFExporter {
       });
       throw new ExportError(
         `Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'export'
+        'export',
+        ExportErrorCode.PDF_GENERATION_FAILED,
+        error instanceof Error ? error : undefined
       );
     } finally {
       // Clean up cache
@@ -366,7 +374,11 @@ export class PDFExporter {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      throw new ExportError('Failed to get canvas context', 'rendering');
+      throw new ExportError(
+        'Failed to get canvas context', 
+        'rendering',
+        ExportErrorCode.RENDERING_FAILED
+      );
     }
 
     // Scale context for high DPI
@@ -540,7 +552,9 @@ export class PDFExporter {
     } catch (error) {
       throw new ExportError(
         `Failed to download PDF: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'download'
+        'download',
+        ExportErrorCode.DOWNLOAD_FAILED,
+        error instanceof Error ? error : undefined
       );
     }
   }
@@ -685,18 +699,7 @@ export class PDFExporter {
   }
 }
 
-/**
- * Custom error class for export errors
- */
-export class ExportError extends Error {
-  constructor(
-    message: string,
-    public stage: 'preparing' | 'rendering' | 'export' | 'download'
-  ) {
-    super(message);
-    this.name = 'ExportError';
-  }
-}
+
 
 /**
  * Create singleton instance
