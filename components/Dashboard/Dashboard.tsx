@@ -15,9 +15,9 @@ import { useHandwritingRenderer } from '@/lib/hooks/useHandwritingRenderer';
 // Lazy load heavy components
 const PreviewPanel = lazy(() => import('./PreviewPanel'));
 const WelcomeModal = lazy(() => import('./WelcomeModal').then(mod => ({ default: mod.default })));
-const FontSelector = lazy(() => import('@/components/Controls/FontSelector'));
-const PageStyleSelector = lazy(() => import('@/components/Controls/PageStyleSelector'));
-const ColorPicker = lazy(() => import('@/components/Controls/ColorPicker'));
+const FontSelectorDropdown = lazy(() => import('@/components/Controls/FontSelectorDropdown'));
+const PageStyleSelectorDropdown = lazy(() => import('@/components/Controls/PageStyleSelectorDropdown'));
+const ColorPickerDropdown = lazy(() => import('@/components/Controls/ColorPickerDropdown'));
 const ExportButton = lazy(() => import('@/components/Controls/ExportButton'));
 
 // Import useShouldShowWelcome separately since it's not a component
@@ -92,9 +92,12 @@ export default function Dashboard() {
    * Handle prompt submission
    */
   const handlePromptSubmit = useCallback(
-    async (prompt: string) => {
+    async (prompt: string, directContext?: string) => {
       dispatch({ type: 'SET_GENERATING', payload: true });
       info('Generating answers...');
+
+      // Use direct context if provided, otherwise use uploaded content
+      const contextToUse = directContext || state.uploadedContent?.text || '';
 
       try {
         const response = await fetch('/api/generate', {
@@ -104,7 +107,7 @@ export default function Dashboard() {
           },
           body: JSON.stringify({
             prompt,
-            context: state.uploadedContent?.text || '',
+            context: contextToUse,
           }),
         });
 
@@ -207,30 +210,28 @@ export default function Dashboard() {
                 Customize Appearance
               </h2>
               <Suspense fallback={<InlineLoader message="Loading controls..." />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                  {/* Font Selector */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-                    {state.selectedFont && (
-                      <FontSelector
-                        selectedFont={state.selectedFont}
-                        onFontChange={handleFontChange}
-                      />
-                    )}
-                  </div>
-
-                  {/* Page Style Selector */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-                    <PageStyleSelector
-                      selectedStyle={state.selectedPageStyle}
-                      onStyleChange={handlePageStyleChange}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Font Selector Dropdown */}
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <FontSelectorDropdown
+                      selectedFont={state.selectedFont}
+                      onFontChange={handleFontChange}
                     />
                   </div>
 
-                  {/* Color Picker */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-                    <ColorPicker
+                  {/* Color Picker Dropdown */}
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <ColorPickerDropdown
                       selectedColor={state.selectedColor}
                       onColorChange={handleColorChange}
+                    />
+                  </div>
+
+                  {/* Page Style Selector Dropdown */}
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <PageStyleSelectorDropdown
+                      selectedStyle={state.selectedPageStyle}
+                      onStyleChange={handlePageStyleChange}
                     />
                   </div>
                 </div>
