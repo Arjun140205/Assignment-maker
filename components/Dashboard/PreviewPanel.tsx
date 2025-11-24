@@ -5,11 +5,12 @@
  * Shows text editor on left and canvas preview on right with synchronized scrolling
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Answer, CanvasPage, HandwrittenFont, PageStyle } from '@/lib/types';
 import TextEditor from '@/components/Editor/TextEditor';
 import NotebookCanvas from '@/components/Canvas/NotebookCanvas';
 import { useAppContext } from '@/lib/context/AppContext';
+import { rafThrottle } from '@/lib/utils/performance';
 
 interface PreviewPanelProps {
   textContent: Answer[];
@@ -83,9 +84,9 @@ export default function PreviewPanel({
   }, []);
 
   /**
-   * Handle synchronized scrolling between panes
+   * Handle synchronized scrolling between panes (throttled with RAF)
    */
-  const handleLeftScroll = useCallback(() => {
+  const handleLeftScrollRaw = useCallback(() => {
     if (!syncScroll || !leftPaneRef.current || !rightPaneRef.current) return;
 
     const leftPane = leftPaneRef.current;
@@ -100,7 +101,7 @@ export default function PreviewPanel({
       scrollPercentage * (rightPane.scrollHeight - rightPane.clientHeight);
   }, [syncScroll]);
 
-  const handleRightScroll = useCallback(() => {
+  const handleRightScrollRaw = useCallback(() => {
     if (!syncScroll || !leftPaneRef.current || !rightPaneRef.current) return;
 
     const leftPane = leftPaneRef.current;
@@ -114,6 +115,17 @@ export default function PreviewPanel({
     leftPane.scrollTop =
       scrollPercentage * (leftPane.scrollHeight - leftPane.clientHeight);
   }, [syncScroll]);
+
+  // Throttle scroll handlers using requestAnimationFrame for smooth 60fps scrolling
+  const handleLeftScroll = useMemo(
+    () => rafThrottle(handleLeftScrollRaw),
+    [handleLeftScrollRaw]
+  );
+
+  const handleRightScroll = useMemo(
+    () => rafThrottle(handleRightScrollRaw),
+    [handleRightScrollRaw]
+  );
 
   /**
    * Set up resize event listeners
