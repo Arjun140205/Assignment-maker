@@ -21,7 +21,7 @@ export interface AppState {
   prompt: string;
   generatedAnswers: Answer[];
   editedAnswers: Map<number, string>;
-  selectedFont: HandwrittenFont | null;
+  selectedFont: HandwrittenFont;
   selectedPageStyle: PageStyle;
   selectedColor: string;
   canvasPages: CanvasPage[];
@@ -53,7 +53,13 @@ const initialState: AppState = {
   prompt: '',
   generatedAnswers: [],
   editedAnswers: new Map(),
-  selectedFont: null,
+  selectedFont: {
+    id: 'caveat',
+    name: 'Caveat',
+    family: 'Caveat',
+    url: 'https://fonts.googleapis.com/css2?family=Caveat:wght@400&display=swap',
+    preview: 'The quick brown fox jumps over the lazy dog'
+  },
   selectedPageStyle: 'ruled',
   selectedColor: '#000000',
   canvasPages: [],
