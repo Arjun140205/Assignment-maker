@@ -23,21 +23,6 @@ const NotebookCanvas: React.FC<NotebookCanvasProps> = ({
   textColor,
   onPageRender,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Initialize canvas container
-  useEffect(() => {
-    if (containerRef.current) {
-      setIsInitialized(true);
-    }
-
-    return () => {
-      // Cleanup on unmount
-      setIsInitialized(false);
-    };
-  }, []);
-
   // Handle page render callback
   const handlePageRender = (pageIndex: number) => {
     if (onPageRender) {
@@ -45,22 +30,17 @@ const NotebookCanvas: React.FC<NotebookCanvasProps> = ({
     }
   };
 
-  if (!isInitialized) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-gray-900">Initializing canvas...</div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      ref={containerRef}
-      className="notebook-canvas-container w-full h-full overflow-auto bg-gray-100 p-8"
-    >
+    <div className="notebook-canvas-container w-full h-full overflow-auto bg-gray-100 p-8">
       {pages.length === 0 ? (
-        <div className="flex items-center justify-center h-full">
-          <div className="text-gray-900">No content to display</div>
+        <div className="flex items-center justify-center h-full min-h-[400px]">
+          <div className="text-center">
+            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="text-lg font-medium text-gray-900">Generating handwritten preview...</p>
+            <p className="text-sm text-gray-600 mt-2">This may take a few moments</p>
+          </div>
         </div>
       ) : (
         <div className="space-y-8">
