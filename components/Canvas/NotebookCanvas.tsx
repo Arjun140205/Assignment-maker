@@ -48,7 +48,7 @@ const NotebookCanvas: React.FC<NotebookCanvasProps> = ({
   if (!isInitialized) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-gray-500">Initializing canvas...</div>
+        <div className="text-gray-900">Initializing canvas...</div>
       </div>
     );
   }
@@ -60,7 +60,7 @@ const NotebookCanvas: React.FC<NotebookCanvasProps> = ({
     >
       {pages.length === 0 ? (
         <div className="flex items-center justify-center h-full">
-          <div className="text-gray-500">No content to display</div>
+          <div className="text-gray-900">No content to display</div>
         </div>
       ) : (
         <div className="space-y-8">
