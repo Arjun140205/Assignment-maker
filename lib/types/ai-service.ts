@@ -5,7 +5,7 @@
 /**
  * AI provider types
  */
-export type AIProvider = 'openai' | 'gemini';
+export type AIProvider = 'openai' | 'gemini' | 'openrouter';
 
 /**
  * Configuration for AI service
