@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/context/AppContext";
+import { NotificationProvider } from "@/lib/context/NotificationContext";
+import NotificationContainer from "@/components/Dashboard/NotificationContainer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppProvider>{children}</AppProvider>
+        <ErrorBoundary>
+          <NotificationProvider>
+            <AppProvider>
+              {children}
+              <NotificationContainer />
+            </AppProvider>
+          </NotificationProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
