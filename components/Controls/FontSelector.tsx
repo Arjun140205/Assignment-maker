@@ -68,10 +68,10 @@ export default function FontSelector({ selectedFont, onFontChange }: FontSelecto
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold mb-3">Select Handwriting Font</h3>
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <h3 className="text-lg font-semibold mb-3 text-gray-900">Select Handwriting Font</h3>
         
         {/* Search and View Toggle */}
         <div className="flex gap-2 mb-3">
@@ -111,9 +111,9 @@ export default function FontSelector({ selectedFont, onFontChange }: FontSelecto
       </div>
 
       {/* Font List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 bg-white">
         {filteredFonts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-900">
             No fonts found matching &quot;{searchQuery}&quot;
           </div>
         ) : viewMode === 'grid' ? (
