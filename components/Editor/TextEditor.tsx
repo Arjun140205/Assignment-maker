@@ -129,8 +129,8 @@ const TextEditor = React.memo(function TextEditor({
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
         <div className="text-center">
-          <p className="text-lg font-medium">No content yet</p>
-          <p className="text-sm mt-2">
+          <p className="text-lg font-medium text-gray-900">No content yet</p>
+          <p className="text-sm mt-2 text-gray-600">
             Upload a file and generate answers to see them here
           </p>
         </div>
@@ -152,7 +152,7 @@ const TextEditor = React.memo(function TextEditor({
             {/* Answer Header */}
             <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-700">
+                <span className="text-sm font-semibold text-gray-900">
                   Question {answer.questionNumber}
                 </span>
                 {edited && (
@@ -161,7 +161,7 @@ const TextEditor = React.memo(function TextEditor({
                   </span>
                 )}
               </div>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-600">
                 {content.split(/\s+/).filter(Boolean).length} words
               </span>
             </div>
@@ -181,18 +181,19 @@ const TextEditor = React.memo(function TextEditor({
                     : 'bg-white cursor-text'
                 }
                 ${edited ? 'border-blue-300' : 'border-gray-200'}
-                text-gray-800 leading-relaxed
+                text-gray-900 leading-relaxed
               `}
               style={{
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
+                color: '#111827',
               }}
             >
               {content}
             </div>
 
             {/* Footer Info */}
-            <div className="mt-2 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-gray-500">
               {readOnly ? (
                 <span>Read-only mode</span>
               ) : (
