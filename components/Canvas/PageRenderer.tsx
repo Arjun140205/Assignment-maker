@@ -14,8 +14,9 @@ interface PageRendererProps {
 /**
  * PageRenderer component - Renders a single canvas page with handwritten text
  * Handles different page styles (ruled, unruled, lined)
+ * Memoized to prevent unnecessary re-renders
  */
-const PageRenderer: React.FC<PageRendererProps> = ({
+const PageRenderer: React.FC<PageRendererProps> = React.memo(({
   page,
   pageStyle,
   font,
@@ -179,6 +180,19 @@ const PageRenderer: React.FC<PageRendererProps> = ({
       )}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function for memoization
+  // Only re-render if these props actually change
+  return (
+    prevProps.page.pageNumber === nextProps.page.pageNumber &&
+    prevProps.page.lines.length === nextProps.page.lines.length &&
+    prevProps.pageStyle === nextProps.pageStyle &&
+    prevProps.font.id === nextProps.font.id &&
+    prevProps.textColor === nextProps.textColor &&
+    JSON.stringify(prevProps.page.lines) === JSON.stringify(nextProps.page.lines)
+  );
+});
+
+PageRenderer.displayName = 'PageRenderer';
 
 export default PageRenderer;
