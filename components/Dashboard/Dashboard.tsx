@@ -111,12 +111,12 @@ export default function Dashboard() {
 
         const result = await response.json();
 
-        if (result.success) {
+        if (result.success && result.data?.answers) {
           dispatch({
             type: 'SET_GENERATED_ANSWERS',
-            payload: result.response.answers,
+            payload: result.data.answers,
           });
-          success(`Generated ${result.response.answers.length} answer(s) successfully!`);
+          success(`Generated ${result.data.answers.length} answer(s) successfully using ${result.data.provider}!`);
         } else {
           showError(result.error?.message || 'Failed to generate answers');
         }
