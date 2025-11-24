@@ -5,8 +5,9 @@
  * Displays generated answers with contenteditable divs for editing
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Answer } from '@/lib/types';
+import { sanitizeText } from '@/lib/utils/validation';
 
 interface TextEditorProps {
   answers: Answer[];
@@ -17,7 +18,7 @@ interface TextEditorProps {
 
 const DEBOUNCE_DELAY = 300; // 300ms debounce delay
 
-export default function TextEditor({
+const TextEditor = React.memo(function TextEditor({
   answers,
   onEdit,
   readOnly = false,
@@ -92,20 +93,24 @@ export default function TextEditor({
    */
   const handleInput = useCallback(
     (answerId: number, event: React.FormEvent<HTMLDivElement>) => {
-      const newContent = event.currentTarget.textContent || '';
-      handleContentChange(answerId, newContent);
+      const rawContent = event.currentTarget.textContent || '';
+      // Sanitize content to prevent XSS
+      const sanitized = sanitizeText(rawContent);
+      handleContentChange(answerId, sanitized);
     },
     [handleContentChange]
   );
 
   /**
-   * Handle paste event to strip formatting
+   * Handle paste event to strip formatting and sanitize
    */
   const handlePaste = useCallback(
     (event: React.ClipboardEvent<HTMLDivElement>) => {
       event.preventDefault();
       const text = event.clipboardData.getData('text/plain');
-      document.execCommand('insertText', false, text);
+      // Sanitize pasted content
+      const sanitized = sanitizeText(text);
+      document.execCommand('insertText', false, sanitized);
     },
     []
   );
@@ -199,4 +204,6 @@ export default function TextEditor({
       })}
     </div>
   );
-}
+});
+
+export default TextEditor;
