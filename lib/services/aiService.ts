@@ -189,65 +189,94 @@ export class AIService {
   }
 
   /**
-   * Call AI provider with retry logic and exponential backoff
+   * Call AI provider with retry logic and fallback chain
    */
   private async callProviderWithRetry(prompt: string): Promise<string> {
+    // Define fallback chain: Gemini -> OpenRouter -> OpenAI
+    const fallbackChain = [
+      { provider: 'gemini' as AIProvider, model: 'gemini-2.0-flash', apiKey: process.env.GEMINI_API_KEY },
+      { provider: 'openrouter' as AIProvider, model: 'google/gemini-2.0-flash-exp:free', apiKey: process.env.OPENROUTER_API_KEY },
+      { provider: 'openai' as AIProvider, model: 'gpt-3.5-turbo', apiKey: process.env.OPENAI_API_KEY },
+    ];
+
     let lastError: Error | null = null;
-    let delay = this.retryConfig.initialDelay;
 
-    for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
-      try {
-        if (attempt > 0) {
-          // Wait before retrying
-          await this.sleep(delay);
-          delay = Math.min(
-            delay * this.retryConfig.backoffMultiplier,
-            this.retryConfig.maxDelay
-          );
+    // Try each provider in the fallback chain
+    for (const fallback of fallbackChain) {
+      if (!fallback.apiKey) {
+        console.warn(`Skipping ${fallback.provider}: API key not configured`);
+        continue;
+      }
+
+      let delay = this.retryConfig.initialDelay;
+
+      // Try each provider with retries
+      for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
+        try {
+          if (attempt > 0) {
+            await this.sleep(delay);
+            delay = Math.min(
+              delay * this.retryConfig.backoffMultiplier,
+              this.retryConfig.maxDelay
+            );
+          }
+
+          console.log(`Attempting ${fallback.provider} (${fallback.model}) - attempt ${attempt + 1}`);
+
+          // Call the appropriate provider
+          if (fallback.provider === 'openai') {
+            return await this.callOpenAI(prompt, fallback.apiKey, fallback.model);
+          } else if (fallback.provider === 'gemini') {
+            return await this.callGemini(prompt, fallback.apiKey, fallback.model);
+          } else if (fallback.provider === 'openrouter') {
+            return await this.callOpenRouter(prompt, fallback.apiKey, fallback.model);
+          }
+        } catch (error) {
+          lastError = error as Error;
+
+          // Log the actual error for debugging
+          if (error instanceof AIGenerationError) {
+            console.error(`${fallback.provider} error:`, {
+              message: error.message,
+              code: error.code,
+              retryable: error.retryable,
+            });
+          } else {
+            console.error(`${fallback.provider} unexpected error:`, error);
+          }
+
+          // Check if error is non-retryable (like invalid API key)
+          if (error instanceof AIGenerationError && !error.retryable) {
+            console.warn(`${fallback.provider} failed with non-retryable error, trying next provider...`);
+            break; // Move to next provider
+          }
+
+          // If this was the last attempt for this provider, move to next provider
+          if (attempt === this.retryConfig.maxRetries) {
+            console.warn(`${fallback.provider} failed after ${this.retryConfig.maxRetries + 1} attempts, trying next provider...`);
+            break;
+          }
+
+          console.warn(`${fallback.provider} attempt ${attempt + 1} failed, retrying...`);
         }
-
-        // Call the appropriate provider
-        if (this.config.provider === 'openai') {
-          return await this.callOpenAI(prompt);
-        } else if (this.config.provider === 'gemini') {
-          return await this.callGemini(prompt);
-        } else {
-          throw new AIGenerationError(
-            `Unsupported provider: ${this.config.provider}`,
-            false,
-            AIGenerationErrorCode.PROVIDER_ERROR,
-            this.config.provider
-          );
-        }
-      } catch (error) {
-        lastError = error as Error;
-
-        // Check if error is retryable
-        if (error instanceof AIGenerationError && !error.retryable) {
-          throw error;
-        }
-
-        // If this was the last attempt, throw the error
-        if (attempt === this.retryConfig.maxRetries) {
-          throw error;
-        }
-
-        console.warn(
-          `AI generation attempt ${attempt + 1} failed, retrying...`,
-          error
-        );
       }
     }
 
-    // This should never be reached, but just in case
-    throw lastError || new Error('AI generation failed after all retries');
+    // All providers failed
+    throw lastError || new AIGenerationError(
+      'All AI providers failed. Please check your API keys and try again.',
+      false,
+      AIGenerationErrorCode.PROVIDER_ERROR,
+      'all'
+    );
   }
 
   /**
    * Call OpenAI API
    */
-  private async callOpenAI(prompt: string): Promise<string> {
-    const model = this.config.model || 'gpt-4o-mini';
+  private async callOpenAI(prompt: string, apiKey?: string, model?: string): Promise<string> {
+    const useApiKey = apiKey || this.config.apiKey;
+    const useModel = model || this.config.model || 'gpt-3.5-turbo';
 
     try {
       const controller = new AbortController();
@@ -260,10 +289,10 @@ export class AIService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${useApiKey}`,
         },
         body: JSON.stringify({
-          model,
+          model: useModel,
           messages: [
             {
               role: 'user',
@@ -352,8 +381,9 @@ export class AIService {
   /**
    * Call Google Gemini API
    */
-  private async callGemini(prompt: string): Promise<string> {
-    const model = this.config.model || 'gemini-1.5-flash';
+  private async callGemini(prompt: string, apiKey?: string, model?: string): Promise<string> {
+    const useApiKey = apiKey || this.config.apiKey;
+    const useModel = model || this.config.model || 'gemini-2.0-flash';
 
     try {
       const controller = new AbortController();
@@ -362,7 +392,7 @@ export class AIService {
         this.config.timeout
       );
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.config.apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${useModel}:generateContent?key=${useApiKey}`;
 
       const response = await fetch(url, {
         method: 'POST',
@@ -460,6 +490,115 @@ export class AIService {
   }
 
   /**
+   * Call OpenRouter API
+   */
+  private async callOpenRouter(prompt: string, apiKey?: string, model?: string): Promise<string> {
+    const useApiKey = apiKey || this.config.apiKey;
+    const useModel = model || this.config.model || 'google/gemini-2.0-flash-exp:free';
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        this.config.timeout
+      );
+
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${useApiKey}`,
+          'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001',
+          'X-Title': 'Handwritten Assignment Generator',
+        },
+        body: JSON.stringify({
+          model: useModel,
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 4000,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        if (response.status === 401 || response.status === 403) {
+          throw new AIGenerationError(
+            'Invalid OpenRouter API key',
+            false,
+            AIGenerationErrorCode.INVALID_API_KEY,
+            'openrouter'
+          );
+        } else if (response.status === 429) {
+          throw new AIGenerationError(
+            'OpenRouter rate limit exceeded',
+            true,
+            AIGenerationErrorCode.RATE_LIMIT_EXCEEDED,
+            'openrouter'
+          );
+        } else if (response.status === 402) {
+          throw new AIGenerationError(
+            'Insufficient OpenRouter credits',
+            false,
+            AIGenerationErrorCode.INSUFFICIENT_QUOTA,
+            'openrouter'
+          );
+        }
+
+        throw new AIGenerationError(
+          errorData.error?.message || `OpenRouter API error: ${response.status}`,
+          response.status >= 500,
+          AIGenerationErrorCode.PROVIDER_ERROR,
+          'openrouter'
+        );
+      }
+
+      const data = await response.json();
+      
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new AIGenerationError(
+          'Invalid response from OpenRouter',
+          false,
+          AIGenerationErrorCode.INVALID_RESPONSE,
+          'openrouter'
+        );
+      }
+
+      return data.choices[0].message.content;
+    } catch (error) {
+      if (error instanceof AIGenerationError) {
+        throw error;
+      }
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new AIGenerationError(
+          'OpenRouter request timeout',
+          true,
+          AIGenerationErrorCode.TIMEOUT,
+          'openrouter',
+          error
+        );
+      }
+
+      throw new AIGenerationError(
+        'Network error calling OpenRouter',
+        true,
+        AIGenerationErrorCode.NETWORK_ERROR,
+        'openrouter',
+        error as Error
+      );
+    }
+  }
+
+  /**
    * Format AI response into structured Answer objects
    */
   private formatResponse(
@@ -545,7 +684,7 @@ export class AIService {
    * Get default model for provider
    */
   private getDefaultModel(): string {
-    return this.config.provider === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash';
+    return this.config.provider === 'openai' ? 'gpt-3.5-turbo' : 'gemini-2.0-flash';
   }
 
   /**
@@ -558,26 +697,29 @@ export class AIService {
 
 /**
  * Create AI service instance from environment variables
+ * Uses fallback chain, so any valid API key will work
  */
 export function createAIServiceFromEnv(): AIService {
-  const provider = (process.env.NEXT_PUBLIC_AI_PROVIDER || 'openai') as AIProvider;
+  const provider = (process.env.NEXT_PUBLIC_AI_PROVIDER || 'gemini') as AIProvider;
   
-  const apiKey =
-    provider === 'openai'
-      ? process.env.OPENAI_API_KEY
-      : process.env.GEMINI_API_KEY;
+  // Check if at least one API key is configured
+  const hasGemini = !!process.env.GEMINI_API_KEY;
+  const hasOpenRouter = !!process.env.OPENROUTER_API_KEY;
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
 
-  if (!apiKey) {
+  if (!hasGemini && !hasOpenRouter && !hasOpenAI) {
     throw new AIGenerationError(
-      `API key not configured for provider: ${provider}`,
+      'No AI provider API keys configured. Please set at least one: GEMINI_API_KEY, OPENROUTER_API_KEY, or OPENAI_API_KEY',
       false,
       AIGenerationErrorCode.INVALID_API_KEY,
-      provider
+      'all'
     );
   }
 
+  // Use a dummy key since the fallback chain will use the actual keys from env
+  // The callProviderWithRetry method reads directly from process.env
   return new AIService({
     provider,
-    apiKey,
+    apiKey: 'fallback-chain', // Placeholder, actual keys read in callProviderWithRetry
   });
 }
