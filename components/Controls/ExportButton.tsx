@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { CanvasPage, PageStyle, HandwrittenFont } from '@/lib/types/canvas';
-import { pdfExporter, ExportOptions, ExportProgress, ExportError } from '@/lib/services/pdfExporter';
+import { CanvasPage, PageStyle, HandwrittenFont, ExportError } from '@/lib/types/canvas';
+import { pdfExporter, ExportOptions, ExportProgress } from '@/lib/services/pdfExporter';
 
 interface ExportButtonProps {
   pages: CanvasPage[];
