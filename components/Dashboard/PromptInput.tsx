@@ -73,67 +73,43 @@ export default function PromptInput({
 
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <label
-            htmlFor="prompt-input"
-            className="text-lg font-semibold text-gray-800"
-          >
-            Enter Your Prompt
-          </label>
-          {prompt && (
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={isGenerating}
-              className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        {/* Context Display */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Context Display - Compact */}
         {uploadedContent && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <span className="font-medium">Context loaded:</span> Content from
-              uploaded file is available
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              {uploadedContent.length} characters extracted
+          <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-xs text-blue-800">
+              ✓ Context loaded ({uploadedContent.length} characters)
             </p>
           </div>
         )}
 
         {!uploadedContent && (
-          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              ⚠ Please upload a file first to provide context for AI generation
+          <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-xs text-yellow-800">
+              ⚠ Upload a file first to provide context
             </p>
           </div>
         )}
 
-        {/* Textarea */}
+        {/* Textarea - Compact */}
         <div className="relative">
           <textarea
             id="prompt-input"
             value={prompt}
             onChange={handleChange}
             disabled={isDisabled}
-            placeholder="Example: Generate answers for the following questions. Each answer should be approximately 200 words..."
+            placeholder="Enter your prompt here... (e.g., Generate answers for the following questions. Each answer should be approximately 200 words...)"
             className={`
-              w-full min-h-[200px] p-4 border rounded-lg resize-y
+              w-full min-h-[100px] p-3 border rounded-lg resize-y text-gray-900
               focus:outline-none focus:ring-2 focus:ring-blue-500
               disabled:bg-gray-100 disabled:cursor-not-allowed
               ${error ? 'border-red-500' : 'border-gray-300'}
             `}
-            rows={8}
+            rows={4}
           />
 
           {/* Character Counter */}
-          <div className="absolute bottom-3 right-3 text-sm">
+          <div className="absolute bottom-2 right-2 text-xs bg-white px-2 py-1 rounded">
             <span
               className={`
                 ${
@@ -146,15 +122,11 @@ export default function PromptInput({
               `}
             >
               {remainingChars < 0 ? (
-                <>
-                  <span className="text-red-600">
-                    {Math.abs(remainingChars)} over limit
-                  </span>
-                </>
+                <span className="text-red-600">
+                  {Math.abs(remainingChars)} over
+                </span>
               ) : (
-                <>
-                  {prompt.length} / {MAX_PROMPT_LENGTH}
-                </>
+                <>{prompt.length} / {MAX_PROMPT_LENGTH}</>
               )}
             </span>
           </div>
@@ -162,17 +134,17 @@ export default function PromptInput({
 
         {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-800">✗ {error}</p>
+          <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-xs text-red-800">✗ {error}</p>
           </div>
         )}
 
-        {/* Submit Button */}
+        {/* Submit Button - Compact */}
         <button
           type="submit"
           disabled={!isValid || isDisabled}
           className={`
-            w-full py-3 px-6 rounded-lg font-medium text-white
+            w-full py-2.5 px-4 rounded-lg font-medium text-white text-sm
             transition-all duration-200
             ${
               !isValid || isDisabled
@@ -184,7 +156,7 @@ export default function PromptInput({
           {isGenerating ? (
             <span className="flex items-center justify-center gap-2">
               <svg
-                className="animate-spin h-5 w-5 text-white"
+                className="animate-spin h-4 w-4 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -206,20 +178,9 @@ export default function PromptInput({
               Generating...
             </span>
           ) : (
-            'Generate Answers'
+            '🚀 Generate Answers'
           )}
         </button>
-
-        {/* Helper Text */}
-        <div className="text-sm text-gray-600">
-          <p className="font-medium mb-2">Tips for better results:</p>
-          <ul className="list-disc list-inside space-y-1 text-gray-500">
-            <li>Specify word count requirements (e.g., "200 words per answer")</li>
-            <li>Number your questions clearly</li>
-            <li>Provide context about the assignment type</li>
-            <li>Be specific about formatting preferences</li>
-          </ul>
-        </div>
       </form>
     </div>
   );
