@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
 
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {},
+
   // Production optimizations
   compress: true,
   poweredByHeader: false,
