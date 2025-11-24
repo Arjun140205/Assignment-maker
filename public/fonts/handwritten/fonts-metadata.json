@@ -1,0 +1,184 @@
+{
+  "fonts": [
+    {
+      "id": "caveat",
+      "name": "Caveat",
+      "family": "Caveat",
+      "url": "https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "caveat-bold",
+      "name": "Caveat Bold",
+      "family": "Caveat",
+      "url": "https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "700"
+    },
+    {
+      "id": "indie-flower",
+      "name": "Indie Flower",
+      "family": "Indie Flower",
+      "url": "https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "shadows-into-light",
+      "name": "Shadows Into Light",
+      "family": "Shadows Into Light",
+      "url": "https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "patrick-hand",
+      "name": "Patrick Hand",
+      "family": "Patrick Hand",
+      "url": "https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "kalam",
+      "name": "Kalam",
+      "family": "Kalam",
+      "url": "https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "kalam-light",
+      "name": "Kalam Light",
+      "family": "Kalam",
+      "url": "https://fonts.googleapis.com/css2?family=Kalam:wght@300&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "300"
+    },
+    {
+      "id": "kalam-bold",
+      "name": "Kalam Bold",
+      "family": "Kalam",
+      "url": "https://fonts.googleapis.com/css2?family=Kalam:wght@700&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "700"
+    },
+    {
+      "id": "architects-daughter",
+      "name": "Architects Daughter",
+      "family": "Architects Daughter",
+      "url": "https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "permanent-marker",
+      "name": "Permanent Marker",
+      "family": "Permanent Marker",
+      "url": "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "marker",
+      "weight": "400"
+    },
+    {
+      "id": "gloria-hallelujah",
+      "name": "Gloria Hallelujah",
+      "family": "Gloria Hallelujah",
+      "url": "https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "homemade-apple",
+      "name": "Homemade Apple",
+      "family": "Homemade Apple",
+      "url": "https://fonts.googleapis.com/css2?family=Homemade+Apple&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "cursive",
+      "weight": "400"
+    },
+    {
+      "id": "reenie-beanie",
+      "name": "Reenie Beanie",
+      "family": "Reenie Beanie",
+      "url": "https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "rock-salt",
+      "name": "Rock Salt",
+      "family": "Rock Salt",
+      "url": "https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "schoolbell",
+      "name": "Schoolbell",
+      "family": "Schoolbell",
+      "url": "https://fonts.googleapis.com/css2?family=Schoolbell&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "waiting-for-the-sunrise",
+      "name": "Waiting for the Sunrise",
+      "family": "Waiting for the Sunrise",
+      "url": "https://fonts.googleapis.com/css2?family=Waiting+for+the+Sunrise&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "just-another-hand",
+      "name": "Just Another Hand",
+      "family": "Just Another Hand",
+      "url": "https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "covered-by-your-grace",
+      "name": "Covered By Your Grace",
+      "family": "Covered By Your Grace",
+      "url": "https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "casual",
+      "weight": "400"
+    },
+    {
+      "id": "dancing-script",
+      "name": "Dancing Script",
+      "family": "Dancing Script",
+      "url": "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "cursive",
+      "weight": "400"
+    },
+    {
+      "id": "pacifico",
+      "name": "Pacifico",
+      "family": "Pacifico",
+      "url": "https://fonts.googleapis.com/css2?family=Pacifico&display=swap",
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "category": "cursive",
+      "weight": "400"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "fonts": [
+    {"id": "amatic-sc", "name": "Amatic SC", "family": "Amatic SC", "url": "https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap", "category": "casual", "weight": "400"},
+    {"id": "annie-use-your-telescope", "name": "Annie Use Your Telescope", "family": "Annie Use Your Telescope", "url": "https://fonts.googleapis.com/css2?family=Annie+Use+Your+Telescope&display=swap", "category": "casual", "weight": "400"},
+    {"id": "bad-script", "name": "Bad Script", "family": "Bad Script", "url": "https://fonts.googleapis.com/css2?family=Bad+Script&display=swap", "category": "casual", "weight": "400"},
+    {"id": "calligraffitti", "name": "Calligraffitti", "family": "Calligraffitti", "url": "https://fonts.googleapis.com/css2?family=Calligraffitti&display=swap", "category": "cursive", "weight": "400"},
+    {"id": "cedarville-cursive", "name": "Cedarville Cursive", "family": "Cedarville Cursive", "url": "https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap", "category": "cursive", "weight": "400"},
+    {"id": "coming-soon", "name": "Coming Soon", "family": "Coming Soon", "url": "https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap", "category": "casual", "weight": "400"},
+    {"id": "crafty-girls", "name": "Crafty Girls", "family": "Crafty Girls", "url": "https://fonts.googleapis.com/css2?family=Crafty+Girls&display=swap", "category": "casual", "weight": "400"},
+    {"id": "dawning-of-a-new-day", "name": "Dawning of a New Day", "family": "Dawning of a New Day", "url": "https://fonts.googleapis.com/css2?family=Dawning+of+a+New+Day&display=swap", "category": "cursive", "weight": "400"},
+    {"id": "delius", "name": "Delius", "family": "Delius", "url": "https://fonts.googleapis.com/css2?family=Delius&display=swap", "category": "casual", "weight": "400"},
+    {"id": "delius-swash-caps", "name": "Delius Swash Caps", "family": "Delius Swash Caps", "url": "https://fonts.googleapis.com/css2?family=Delius+Swash+Caps&display=swap", "category": "casual", "weight": "400"}
+  ]
+}
