@@ -43,10 +43,14 @@ interface LineWithMetadata {
 
 /**
  * LayoutEngine class for intelligent content positioning
+ * Implements caching for layout calculations
  */
 export class LayoutEngine {
   private config: LayoutConfig;
   private textMeasurement: TextMeasurement;
+  private layoutCache: Map<string, LayoutResult> = new Map();
+  private lineCache: Map<string, string[]> = new Map();
+  private readonly MAX_CACHE_SIZE = 100;
 
   constructor(config?: Partial<LayoutConfig>) {
     // Default A4 size at 96 DPI with 0.5 inch margins
@@ -68,24 +72,64 @@ export class LayoutEngine {
   }
 
   /**
-   * Calculate layout for answers
+   * Calculate layout for answers with caching
    */
   calculateLayout(
     answers: Answer[],
     font: HandwrittenFont,
     pageStyle: PageStyle
   ): LayoutResult {
+    // Create cache key based on content and settings
+    const cacheKey = this.createLayoutCacheKey(answers, font, pageStyle);
+    
+    // Check cache first
+    if (this.layoutCache.has(cacheKey)) {
+      return this.layoutCache.get(cacheKey)!;
+    }
+
     // Convert answers to lines with metadata
     const linesWithMetadata = this.answersToLines(answers, font);
 
     // Distribute lines across pages
     const pages = this.distributeAcrossPages(linesWithMetadata, pageStyle);
 
-    return {
+    const result: LayoutResult = {
       pages,
       totalPages: pages.length,
       totalLines: linesWithMetadata.length,
     };
+
+    // Cache the result
+    this.cacheLayout(cacheKey, result);
+
+    return result;
+  }
+
+  /**
+   * Create cache key for layout
+   */
+  private createLayoutCacheKey(
+    answers: Answer[],
+    font: HandwrittenFont,
+    pageStyle: PageStyle
+  ): string {
+    const contentHash = answers
+      .map(a => `${a.questionNumber}:${a.content.length}`)
+      .join('|');
+    return `${contentHash}-${font.id}-${pageStyle}-${JSON.stringify(this.config)}`;
+  }
+
+  /**
+   * Cache layout result with size limit
+   */
+  private cacheLayout(key: string, result: LayoutResult): void {
+    if (this.layoutCache.size >= this.MAX_CACHE_SIZE) {
+      const firstKey = this.layoutCache.keys().next().value;
+      if (firstKey) {
+        this.layoutCache.delete(firstKey);
+      }
+    }
+    this.layoutCache.set(key, result);
   }
 
   /**
@@ -125,9 +169,17 @@ export class LayoutEngine {
   }
 
   /**
-   * Split text into lines with word boundary detection
+   * Split text into lines with word boundary detection and caching
    */
   splitIntoLines(text: string, font: HandwrittenFont): string[] {
+    // Create cache key
+    const cacheKey = `${text.substring(0, 100)}-${font.id}-${this.config.pageWidth}`;
+    
+    // Check cache first
+    if (this.lineCache.has(cacheKey)) {
+      return this.lineCache.get(cacheKey)!;
+    }
+
     const maxWidth =
       this.config.pageWidth - this.config.marginLeft - this.config.marginRight;
 
@@ -148,7 +200,23 @@ export class LayoutEngine {
       allLines.push(...lines);
     }
 
+    // Cache the result
+    this.cacheLines(cacheKey, allLines);
+
     return allLines;
+  }
+
+  /**
+   * Cache line split result with size limit
+   */
+  private cacheLines(key: string, lines: string[]): void {
+    if (this.lineCache.size >= this.MAX_CACHE_SIZE) {
+      const firstKey = this.lineCache.keys().next().value;
+      if (firstKey) {
+        this.lineCache.delete(firstKey);
+      }
+    }
+    this.lineCache.set(key, lines);
   }
 
   /**
@@ -329,10 +397,30 @@ export class LayoutEngine {
   }
 
   /**
-   * Update layout configuration
+   * Update layout configuration and clear caches
    */
   updateConfig(config: Partial<LayoutConfig>): void {
     this.config = { ...this.config, ...config };
+    // Clear caches when configuration changes
+    this.clearCache();
+  }
+
+  /**
+   * Clear all caches
+   */
+  clearCache(): void {
+    this.layoutCache.clear();
+    this.lineCache.clear();
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): { layoutCacheSize: number; lineCacheSize: number } {
+    return {
+      layoutCacheSize: this.layoutCache.size,
+      lineCacheSize: this.lineCache.size,
+    };
   }
 
   /**
@@ -360,6 +448,7 @@ export class LayoutEngine {
    * Cleanup resources
    */
   destroy(): void {
+    this.clearCache();
     this.textMeasurement.destroy();
   }
 }
