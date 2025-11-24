@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback, ChangeEvent, FormEvent } from 'react';
+import { validatePrompt, sanitizeText } from '@/lib/utils/validation';
 
 interface PromptInputProps {
   onSubmit: (prompt: string) => void;
@@ -46,14 +47,10 @@ export default function PromptInput({
     (e: FormEvent) => {
       e.preventDefault();
 
-      // Validation
-      if (!prompt.trim()) {
-        setError('Please enter a prompt');
-        return;
-      }
-
-      if (prompt.length > MAX_PROMPT_LENGTH) {
-        setError(`Prompt must be ${MAX_PROMPT_LENGTH} characters or less`);
+      // Validate prompt
+      const validation = validatePrompt(prompt);
+      if (!validation.valid) {
+        setError(validation.error || 'Invalid prompt');
         return;
       }
 
@@ -62,9 +59,9 @@ export default function PromptInput({
         return;
       }
 
-      // Clear error and submit
+      // Clear error and submit with sanitized prompt
       setError(null);
-      onSubmit(prompt.trim());
+      onSubmit(validation.sanitized || prompt.trim());
     },
     [prompt, uploadedContent, onSubmit]
   );
