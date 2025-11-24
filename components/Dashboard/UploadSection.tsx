@@ -42,6 +42,8 @@ export default function UploadSection({
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [pastedText, setPastedText] = useState('');
+  const [inputMode, setInputMode] = useState<'upload' | 'paste'>('upload');
 
   const processFile = async (file: File) => {
     setIsProcessing(true);
@@ -170,63 +172,125 @@ export default function UploadSection({
     disabled: isProcessing,
   });
 
+  const handlePastedTextSubmit = () => {
+    if (!pastedText.trim()) {
+      if (onError) {
+        onError('Please enter some text');
+      }
+      return;
+    }
+
+    const content: ExtractedContent = {
+      text: pastedText.trim(),
+      metadata: {
+        pageCount: 1,
+        wordCount: pastedText.trim().split(/\s+/).length,
+      },
+    };
+
+    onFileUpload(content);
+    setUploadedFile('Pasted text');
+  };
+
   return (
     <div className="w-full">
-      <div
-        {...getRootProps()}
-        className={`
-          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-          transition-all duration-200 ease-in-out
-          ${
-            isDragActive
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400'
-          }
-          ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
-      >
-        <input {...getInputProps()} />
-        
-        <div className="flex flex-col items-center gap-4">
-          {/* Upload Icon */}
-          <svg
-            className="w-12 h-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-            />
-          </svg>
+      {/* Mode Toggle */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setInputMode('upload')}
+          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+            inputMode === 'upload'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Upload File
+        </button>
+        <button
+          onClick={() => setInputMode('paste')}
+          className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+            inputMode === 'paste'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Paste Text
+        </button>
+      </div>
 
-          {/* Upload Text */}
-          <div>
-            {isDragActive ? (
-              <p className="text-lg font-medium text-blue-600">
-                Drop the file here
-              </p>
-            ) : (
-              <>
-                <p className="text-lg font-medium text-gray-700">
-                  {isProcessing
-                    ? 'Processing file...'
-                    : 'Drag & drop a file here, or click to select'}
+      {inputMode === 'upload' ? (
+        <div
+          {...getRootProps()}
+          className={`
+            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
+            transition-all duration-200 ease-in-out
+            ${
+              isDragActive
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-300 hover:border-gray-400'
+            }
+            ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+          `}
+        >
+          <input {...getInputProps()} />
+          
+          <div className="flex flex-col items-center gap-4">
+            {/* Upload Icon */}
+            <svg
+              className="w-12 h-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+
+            {/* Upload Text */}
+            <div>
+              {isDragActive ? (
+                <p className="text-lg font-medium text-blue-600">
+                  Drop the file here
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Supports PDF, DOCX, images (PNG, JPG), and text files
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Maximum file size: {MAX_FILE_SIZE / 1024 / 1024}MB
-                </p>
-              </>
-            )}
+              ) : (
+                <>
+                  <p className="text-lg font-medium text-gray-700">
+                    {isProcessing
+                      ? 'Processing file...'
+                      : 'Drag & drop a file here, or click to select'}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Supports PDF, DOCX, images (PNG, JPG), and text files
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Maximum file size: {MAX_FILE_SIZE / 1024 / 1024}MB
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-3">
+          <textarea
+            value={pastedText}
+            onChange={(e) => setPastedText(e.target.value)}
+            placeholder="Paste your assignment questions here..."
+            className="w-full h-48 p-4 border-2 border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 transition-colors"
+          />
+          <button
+            onClick={handlePastedTextSubmit}
+            disabled={!pastedText.trim()}
+            className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          >
+            Use This Text
+          </button>
+        </div>
+      )}
 
       {/* Progress Indicator */}
       {uploadProgress && (
