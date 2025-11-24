@@ -68,10 +68,10 @@ export default function ColorPicker({
   const isPredefinedColor = predefinedColors.some(c => c.hex === selectedColor);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold mb-1">Text Color</h3>
+      <div className="p-4 border-b border-gray-200 bg-white">
+        <h3 className="text-lg font-semibold mb-1 text-gray-900">Text Color</h3>
         <p className="text-sm text-gray-600">
           Choose the color for your handwritten text
         </p>
@@ -85,16 +85,16 @@ export default function ColorPicker({
             style={{ backgroundColor: selectedColor }}
           />
           <div>
-            <div className="text-sm font-medium text-gray-700">Current Color</div>
-            <div className="text-xs text-gray-500 font-mono">{selectedColor.toUpperCase()}</div>
+            <div className="text-sm font-medium text-gray-900">Current Color</div>
+            <div className="text-xs text-gray-600 font-mono">{selectedColor.toUpperCase()}</div>
           </div>
         </div>
       </div>
 
       {/* Predefined Colors */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 bg-white">
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Predefined Colors</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-3">Predefined Colors</h4>
           <div className="grid grid-cols-1 gap-2">
             {predefinedColors.map((color) => (
               <ColorSwatch
@@ -109,7 +109,7 @@ export default function ColorPicker({
 
         {/* Custom Color Picker */}
         <div className="mt-6 pt-4 border-t border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Custom Color</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-3">Custom Color</h4>
           
           {!showCustomPicker ? (
             <button
