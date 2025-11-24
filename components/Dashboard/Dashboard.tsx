@@ -7,8 +7,7 @@
 import { useCallback, useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useAppContext } from '@/lib/context/AppContext';
 import { useNotifications } from '@/lib/context/NotificationContext';
-import UploadSection from './UploadSection';
-import PromptInput from './PromptInput';
+import UnifiedInput from './UnifiedInput';
 import { InlineLoader } from './LoadingSpinner';
 import { ExtractedContent, Answer, HandwrittenFont, PageStyle } from '@/lib/types';
 import { useHandwritingRenderer } from '@/lib/hooks/useHandwritingRenderer';
@@ -184,55 +183,33 @@ export default function Dashboard() {
         </Suspense>
       )}
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-            Handwritten Assignment Generator
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">
-            Transform your assignments into handwritten documents
-          </p>
-        </div>
-      </header>
+        <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+              Handwritten Assignment Generator
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              Transform your assignments into handwritten documents
+            </p>
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        <div className="space-y-6 lg:space-y-8">
-          {/* Upload Section */}
-          <section className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
-              Step 1: Upload Your Assignment
-            </h2>
-            <UploadSection 
-              onFileUpload={handleFileUpload}
-              onError={handleFileUploadError}
-            />
-          </section>
-
-          {/* Prompt Input Section */}
-          <section className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
-              Step 2: Enter Your Prompt
-            </h2>
-            <PromptInput
-              onSubmit={handlePromptSubmit}
-              uploadedContent={state.uploadedContent?.text || null}
-              isGenerating={state.isGenerating}
-            />
-          </section>
-
-          {/* Customization Controls Section */}
+        {/* Main Content - ChatGPT-like Layout */}
+        <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full">
+          {/* Messages/Content Area */}
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="space-y-6">{/* Customization Controls Section */}
           {state.generatedAnswers.length > 0 && (
             <section className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
-                Step 3: Customize Appearance
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
+                Customize Appearance
               </h2>
               <Suspense fallback={<InlineLoader message="Loading controls..." />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                   {/* Font Selector */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                     {state.selectedFont && (
                       <FontSelector
                         selectedFont={state.selectedFont}
@@ -242,7 +219,7 @@ export default function Dashboard() {
                   </div>
 
                   {/* Page Style Selector */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                     <PageStyleSelector
                       selectedStyle={state.selectedPageStyle}
                       onStyleChange={handlePageStyleChange}
@@ -250,7 +227,7 @@ export default function Dashboard() {
                   </div>
 
                   {/* Color Picker */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                     <ColorPicker
                       selectedColor={state.selectedColor}
                       onColorChange={handleColorChange}
@@ -261,7 +238,7 @@ export default function Dashboard() {
                 {/* Export Button */}
                 {state.canvasPages.length > 0 && state.selectedFont && (
                   <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                    <h3 className="text-sm sm:text-md font-semibold text-gray-800 mb-3">
+                    <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-3">
                       Export Your Document
                     </h3>
                     <ExportButton
@@ -282,8 +259,8 @@ export default function Dashboard() {
           {state.generatedAnswers.length > 0 && (
             <section className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 sm:mb-4">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-800">
-                  Step 4: Review and Edit
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  Review and Edit
                 </h2>
                 {state.isRendering && (
                   <InlineLoader message="Rendering handwriting..." />
@@ -302,8 +279,24 @@ export default function Dashboard() {
               </div>
             </section>
           )}
-        </div>
-      </main>
+            </div>
+          </div>
+
+          {/* Input Area - Fixed at Bottom (ChatGPT-like) */}
+          <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+            <div className="px-4 sm:px-6 lg:px-8 py-4">
+              <UnifiedInput
+                onSubmit={handlePromptSubmit}
+                onFileUpload={handleFileUpload}
+                onError={handleFileUploadError}
+                uploadedContent={state.uploadedContent?.text || null}
+                isGenerating={state.isGenerating}
+              />
+            </div>
+          </div>
+        </main>
+
+
       </div>
     </>
   );
