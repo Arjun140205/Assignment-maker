@@ -37,10 +37,14 @@ export interface PaddingConfig {
 
 /**
  * TextMeasurement class for canvas-based text measurements
+ * Implements caching for improved performance
  */
 export class TextMeasurement {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
+  private widthCache: Map<string, number> = new Map();
+  private metricsCache: Map<string, TextMetrics> = new Map();
+  private readonly MAX_CACHE_SIZE = 1000;
 
   constructor() {
     this.initializeCanvas();
@@ -64,9 +68,17 @@ export class TextMeasurement {
   }
 
   /**
-   * Measure text width using canvas
+   * Measure text width using canvas with caching
    */
   measureTextWidth(text: string, font: HandwrittenFont, fontSize: number): number {
+    // Create cache key
+    const cacheKey = `${font.id}-${fontSize}-${text}`;
+    
+    // Check cache first
+    if (this.widthCache.has(cacheKey)) {
+      return this.widthCache.get(cacheKey)!;
+    }
+
     if (!this.ctx) {
       // Fallback for SSR - rough estimate
       return text.length * fontSize * 0.6;
@@ -74,13 +86,40 @@ export class TextMeasurement {
 
     this.ctx.font = `${fontSize}px "${font.family}", cursive`;
     const metrics = this.ctx.measureText(text);
-    return metrics.width;
+    const width = metrics.width;
+
+    // Cache the result
+    this.cacheWidth(cacheKey, width);
+
+    return width;
   }
 
   /**
-   * Get detailed text metrics
+   * Cache width measurement with size limit
+   */
+  private cacheWidth(key: string, width: number): void {
+    // If cache is full, clear oldest entries (simple FIFO)
+    if (this.widthCache.size >= this.MAX_CACHE_SIZE) {
+      const firstKey = this.widthCache.keys().next().value;
+      if (firstKey) {
+        this.widthCache.delete(firstKey);
+      }
+    }
+    this.widthCache.set(key, width);
+  }
+
+  /**
+   * Get detailed text metrics with caching
    */
   getTextMetrics(text: string, font: HandwrittenFont, fontSize: number): TextMetrics {
+    // Create cache key
+    const cacheKey = `${font.id}-${fontSize}-${text}`;
+    
+    // Check cache first
+    if (this.metricsCache.has(cacheKey)) {
+      return this.metricsCache.get(cacheKey)!;
+    }
+
     if (!this.ctx) {
       // Fallback for SSR
       return {
@@ -94,7 +133,7 @@ export class TextMeasurement {
     this.ctx.font = `${fontSize}px "${font.family}", cursive`;
     const metrics = this.ctx.measureText(text);
 
-    return {
+    const result: TextMetrics = {
       width: metrics.width,
       height:
         (metrics.actualBoundingBoxAscent || fontSize * 0.8) +
@@ -102,6 +141,25 @@ export class TextMeasurement {
       actualBoundingBoxAscent: metrics.actualBoundingBoxAscent || fontSize * 0.8,
       actualBoundingBoxDescent: metrics.actualBoundingBoxDescent || fontSize * 0.2,
     };
+
+    // Cache the result
+    this.cacheMetrics(cacheKey, result);
+
+    return result;
+  }
+
+  /**
+   * Cache metrics with size limit
+   */
+  private cacheMetrics(key: string, metrics: TextMetrics): void {
+    // If cache is full, clear oldest entries (simple FIFO)
+    if (this.metricsCache.size >= this.MAX_CACHE_SIZE) {
+      const firstKey = this.metricsCache.keys().next().value;
+      if (firstKey) {
+        this.metricsCache.delete(firstKey);
+      }
+    }
+    this.metricsCache.set(key, metrics);
   }
 
   /**
@@ -183,9 +241,28 @@ export class TextMeasurement {
   }
 
   /**
+   * Clear caches
+   */
+  clearCache(): void {
+    this.widthCache.clear();
+    this.metricsCache.clear();
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): { widthCacheSize: number; metricsCacheSize: number } {
+    return {
+      widthCacheSize: this.widthCache.size,
+      metricsCacheSize: this.metricsCache.size,
+    };
+  }
+
+  /**
    * Cleanup resources
    */
   destroy(): void {
+    this.clearCache();
     this.canvas = null;
     this.ctx = null;
   }
