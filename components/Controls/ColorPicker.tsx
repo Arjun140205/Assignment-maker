@@ -25,22 +25,11 @@ export default function ColorPicker({
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [customColor, setCustomColor] = useState(selectedColor);
 
-  // Predefined color options (10+ colors as per requirements)
+  // Simple color options (black, blue, red - like real pens)
   const predefinedColors: ColorOption[] = [
     { name: 'Black', hex: '#000000', preview: 'The quick brown fox' },
-    { name: 'Dark Blue', hex: '#1E3A8A', preview: 'The quick brown fox' },
     { name: 'Blue', hex: '#0000FF', preview: 'The quick brown fox' },
-    { name: 'Navy', hex: '#000080', preview: 'The quick brown fox' },
-    { name: 'Red', hex: '#DC2626', preview: 'The quick brown fox' },
-    { name: 'Dark Red', hex: '#FF0000', preview: 'The quick brown fox' },
-    { name: 'Green', hex: '#16A34A', preview: 'The quick brown fox' },
-    { name: 'Dark Green', hex: '#008000', preview: 'The quick brown fox' },
-    { name: 'Purple', hex: '#9333EA', preview: 'The quick brown fox' },
-    { name: 'Dark Purple', hex: '#800080', preview: 'The quick brown fox' },
-    { name: 'Brown', hex: '#92400E', preview: 'The quick brown fox' },
-    { name: 'Dark Brown', hex: '#8B4513', preview: 'The quick brown fox' },
-    { name: 'Gray', hex: '#6B7280', preview: 'The quick brown fox' },
-    { name: 'Dark Gray', hex: '#808080', preview: 'The quick brown fox' },
+    { name: 'Red', hex: '#FF0000', preview: 'The quick brown fox' },
   ];
 
   const handleColorSelect = (color: string) => {
@@ -107,62 +96,7 @@ export default function ColorPicker({
           </div>
         </div>
 
-        {/* Custom Color Picker */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Custom Color</h4>
-          
-          {!showCustomPicker ? (
-            <button
-              onClick={() => setShowCustomPicker(true)}
-              className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span className="text-sm font-medium">Choose Custom Color</span>
-              </div>
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={customColor}
-                  onChange={handleCustomColorChange}
-                  className="w-16 h-16 rounded-lg border-2 border-gray-300 cursor-pointer"
-                />
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={customColor}
-                    onChange={(e) => setCustomColor(e.target.value)}
-                    placeholder="#000000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <button
-                  onClick={handleCustomColorApply}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  Apply
-                </button>
-                <button
-                  onClick={() => {
-                    setShowCustomPicker(false);
-                    setCustomColor(selectedColor);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+
       </div>
     </div>
   );
