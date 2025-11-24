@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { validateColor } from '@/lib/utils/validation';
 
 interface ColorOption {
   name: string;
@@ -53,8 +54,14 @@ export default function ColorPicker({
   };
 
   const handleCustomColorApply = () => {
-    onColorChange(customColor);
-    setShowCustomPicker(false);
+    // Validate color before applying
+    const validation = validateColor(customColor);
+    if (validation.valid && validation.sanitized) {
+      onColorChange(validation.sanitized);
+      setShowCustomPicker(false);
+    } else {
+      alert(validation.error || 'Invalid color format');
+    }
   };
 
   // Check if selected color is a predefined color
