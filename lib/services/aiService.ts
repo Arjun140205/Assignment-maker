@@ -266,8 +266,7 @@ export class AIService {
     throw lastError || new AIGenerationError(
       'All AI providers failed. Please check your API keys and try again.',
       false,
-      AIGenerationErrorCode.PROVIDER_ERROR,
-      'all'
+      AIGenerationErrorCode.PROVIDER_ERROR
     );
   }
 
@@ -711,8 +710,7 @@ export function createAIServiceFromEnv(): AIService {
     throw new AIGenerationError(
       'No AI provider API keys configured. Please set at least one: GEMINI_API_KEY, OPENROUTER_API_KEY, or OPENAI_API_KEY',
       false,
-      AIGenerationErrorCode.INVALID_API_KEY,
-      'all'
+      AIGenerationErrorCode.INVALID_API_KEY
     );
   }
 
