@@ -159,8 +159,8 @@ export default function PreviewPanel({
         onScroll={handleLeftScroll}
       >
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3">
-          <h3 className="text-sm font-semibold text-gray-700">Text Editor</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-sm font-semibold text-gray-900">Text Editor</h3>
+          <p className="text-xs text-gray-600 mt-0.5">
             Edit your answers here
           </p>
         </div>
@@ -199,11 +199,11 @@ export default function PreviewPanel({
         style={{ width: `${100 - leftWidth}%` }}
         onScroll={handleRightScroll}
       >
-        <div className="sticky top-0 z-10 bg-gray-100 border-b border-gray-300 px-6 py-3">
-          <h3 className="text-sm font-semibold text-gray-700">
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3">
+          <h3 className="text-sm font-semibold text-gray-900">
             Handwritten Preview
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-600 mt-0.5">
             {handwrittenContent.length > 0
               ? `${handwrittenContent.length} page${
                   handwrittenContent.length !== 1 ? 's' : ''
@@ -221,9 +221,9 @@ export default function PreviewPanel({
             />
           ) : (
             <div className="flex items-center justify-center h-full min-h-[400px]">
-              <div className="text-center text-gray-500">
+              <div className="text-center">
                 <svg
-                  className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                  className="w-16 h-16 mx-auto mb-4 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -235,8 +235,8 @@ export default function PreviewPanel({
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <p className="text-lg font-medium">No preview available</p>
-                <p className="text-sm mt-2">
+                <p className="text-lg font-medium text-gray-900">No preview available</p>
+                <p className="text-sm mt-2 text-gray-600">
                   {!state.selectedFont 
                     ? 'Select a font to see handwritten preview'
                     : 'Generate answers to see handwritten preview'}
