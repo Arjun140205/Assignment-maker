@@ -11,7 +11,7 @@ import { validatePrompt } from '@/lib/utils/validation';
 import { ExtractedContent, UploadProgress, UploadStage } from '@/lib/types/file-processing';
 
 interface UnifiedInputProps {
-  onSubmit: (prompt: string) => void;
+  onSubmit: (prompt: string, directContext?: string) => void;
   onFileUpload: (content: ExtractedContent) => void;
   onError?: (error: string) => void;
   uploadedContent: string | null;
@@ -173,23 +173,30 @@ export default function UnifiedInput({
         return;
       }
 
+      const sanitizedPrompt = validation.sanitized || prompt.trim();
+
       // If no file is uploaded, use the prompt text as context
       if (!uploadedContent) {
-        // Create a virtual "uploaded content" from the prompt
+        // Create a virtual "uploaded content" from the prompt for state management
         const promptContent: ExtractedContent = {
-          text: prompt.trim(),
+          text: sanitizedPrompt,
           metadata: {
             fileName: 'Direct input',
             fileType: 'text/plain',
-            fileSize: prompt.trim().length,
+            fileSize: sanitizedPrompt.length,
             pageCount: 1,
             extractedAt: new Date(),
           },
         };
         onFileUpload(promptContent);
+        
+        // Pass the context directly to avoid state timing issues
+        onSubmit(sanitizedPrompt, sanitizedPrompt);
+      } else {
+        // File is uploaded, use normal flow
+        onSubmit(sanitizedPrompt);
       }
 
-      onSubmit(validation.sanitized || prompt.trim());
       setPrompt('');
     },
     [prompt, uploadedContent, onSubmit, onError, onFileUpload]
