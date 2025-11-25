@@ -7,7 +7,7 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Answer, CanvasPage, HandwrittenFont, PageStyle } from '@/lib/types';
-import TextEditor from '@/components/Editor/TextEditor';
+import MarkdownTextEditor from '@/components/Editor/MarkdownTextEditor';
 import NotebookCanvas from '@/components/Canvas/NotebookCanvas';
 import { useAppContext } from '@/lib/context/AppContext';
 import { rafThrottle } from '@/lib/utils/performance';
@@ -164,7 +164,7 @@ export default function PreviewPanel({
             Edit your answers here
           </p>
         </div>
-        <TextEditor
+        <MarkdownTextEditor
           answers={textContent}
           onEdit={onTextEdit}
           editedAnswers={editedAnswers}
