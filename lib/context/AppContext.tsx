@@ -12,6 +12,7 @@ import {
   PageStyle,
   CanvasPage,
 } from '@/lib/types';
+import { DEFAULT_FONT } from '@/lib/data/handwritten-fonts';
 
 /**
  * Application state interface
@@ -53,13 +54,7 @@ const initialState: AppState = {
   prompt: '',
   generatedAnswers: [],
   editedAnswers: new Map(),
-  selectedFont: {
-    id: 'caveat',
-    name: 'Caveat',
-    family: 'Caveat',
-    url: 'https://fonts.googleapis.com/css2?family=Caveat:wght@400&display=swap',
-    preview: 'The quick brown fox jumps over the lazy dog'
-  },
+  selectedFont: DEFAULT_FONT,
   selectedPageStyle: 'ruled',
   selectedColor: '#000000',
   canvasPages: [],
@@ -181,11 +176,11 @@ export function AppProvider({ children }: AppProviderProps) {
  */
 export function useAppContext() {
   const context = useContext(AppContext);
-  
+
   if (context === undefined) {
     throw new Error('useAppContext must be used within an AppProvider');
   }
-  
+
   return context;
 }
 
