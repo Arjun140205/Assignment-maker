@@ -8,12 +8,19 @@ import {
   FileProcessingError,
   FileProcessingErrorCode,
 } from '@/lib/types/file-processing';
+import { checkRateLimit } from '@/lib/utils/rateLimit';
 
 /**
  * POST handler for file upload
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitCheck = checkRateLimit(request, 'upload');
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response;
+    }
+
     // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
