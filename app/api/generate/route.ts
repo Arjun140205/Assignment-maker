@@ -10,6 +10,7 @@ import {
   AIGenerationErrorCode,
   GenerationRequest,
 } from '@/lib/types/ai-service';
+import { checkRateLimit } from '@/lib/utils/rateLimit';
 
 /**
  * Request body validation schema
@@ -111,31 +112,31 @@ function getUserFriendlyErrorMessage(error: AIGenerationError): string {
   switch (error.code) {
     case AIGenerationErrorCode.INVALID_API_KEY:
       return `Invalid API key for ${error.provider}. Please check your configuration.`;
-    
+
     case AIGenerationErrorCode.RATE_LIMIT_EXCEEDED:
       return `Rate limit exceeded for ${error.provider}. Please try again in a few moments.`;
-    
+
     case AIGenerationErrorCode.INSUFFICIENT_QUOTA:
       return `Insufficient quota for ${error.provider}. Please check your account.`;
-    
+
     case AIGenerationErrorCode.TIMEOUT:
       return 'Request timed out. Please try again with a shorter prompt or context.';
-    
+
     case AIGenerationErrorCode.NETWORK_ERROR:
       return 'Network error occurred. Please check your connection and try again.';
-    
+
     case AIGenerationErrorCode.INVALID_RESPONSE:
       return 'Received invalid response from AI provider. Please try again.';
-    
+
     case AIGenerationErrorCode.CONTENT_FILTER:
       return 'Content was filtered by the AI provider. Please modify your prompt.';
-    
+
     case AIGenerationErrorCode.PARSING_ERROR:
       return 'Failed to parse AI response. Please try again.';
-    
+
     case AIGenerationErrorCode.PROVIDER_ERROR:
       return `Error from ${error.provider}: ${error.message}`;
-    
+
     default:
       return 'An unexpected error occurred. Please try again.';
   }
@@ -146,6 +147,12 @@ function getUserFriendlyErrorMessage(error: AIGenerationError): string {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitCheck = checkRateLimit(request, 'generate');
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response;
+    }
+
     // Parse request body
     const body = await request.json().catch(() => null);
 
@@ -217,7 +224,7 @@ export async function POST(request: NextRequest) {
     // Handle AIGenerationError
     if (error instanceof AIGenerationError) {
       const statusCode = error.retryable ? 503 : 500;
-      
+
       return NextResponse.json(
         {
           success: false,
