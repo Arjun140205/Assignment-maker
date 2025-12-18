@@ -51,18 +51,18 @@ export class LayoutEngine {
   private layoutCache: Map<string, LayoutResult> = new Map();
   private lineCache: Map<string, string[]> = new Map();
   private readonly MAX_CACHE_SIZE = 100;
+  private readonly SAFETY_MARGIN = 5; // Extra pixels to prevent text touching edges
 
   constructor(config?: Partial<LayoutConfig>) {
-    // Default A4 size at 96 DPI with 0.5 inch margins
-    const defaultMargins = createDefaultMargins(96);
-    
+    // Default A4 size at 96 DPI with proper margins
+    // These values should match PageRenderer.PAGE_CONFIG
     this.config = {
       pageWidth: config?.pageWidth || 794, // ~8.27 inches at 96 DPI
       pageHeight: config?.pageHeight || 1123, // ~11.69 inches at 96 DPI
-      marginTop: config?.marginTop || defaultMargins.top,
-      marginBottom: config?.marginBottom || defaultMargins.bottom,
-      marginLeft: config?.marginLeft || defaultMargins.left,
-      marginRight: config?.marginRight || defaultMargins.right,
+      marginTop: config?.marginTop || 60,
+      marginBottom: config?.marginBottom || 60,
+      marginLeft: config?.marginLeft || 70, // Extra for lined paper margin line
+      marginRight: config?.marginRight || 50,
       lineHeight: config?.lineHeight || 32, // ~8-10mm
       fontSize: config?.fontSize || 18,
       answerSpacing: config?.answerSpacing || 1, // One blank line between answers
@@ -81,7 +81,7 @@ export class LayoutEngine {
   ): LayoutResult {
     // Create cache key based on content and settings
     const cacheKey = this.createLayoutCacheKey(answers, font, pageStyle);
-    
+
     // Check cache first
     if (this.layoutCache.has(cacheKey)) {
       return this.layoutCache.get(cacheKey)!;
@@ -174,7 +174,7 @@ export class LayoutEngine {
   splitIntoLines(text: string, font: HandwrittenFont): string[] {
     // Create cache key
     const cacheKey = `${text.substring(0, 100)}-${font.id}-${this.config.pageWidth}`;
-    
+
     // Check cache first
     if (this.lineCache.has(cacheKey)) {
       return this.lineCache.get(cacheKey)!;
@@ -229,14 +229,14 @@ export class LayoutEngine {
     for (const word of words) {
       // Check if word alone exceeds max width (handle very long words)
       const wordWidth = this.textMeasurement.measureTextWidth(word, font, this.config.fontSize);
-      
+
       if (wordWidth > maxWidth) {
         // Word is too long - need to break it
         if (currentLine) {
           lines.push(currentLine);
           currentLine = '';
         }
-        
+
         // Break long word into chunks
         const chunks = this.breakLongWord(word, font, maxWidth);
         lines.push(...chunks.slice(0, -1));
