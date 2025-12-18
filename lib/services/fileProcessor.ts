@@ -84,9 +84,9 @@ export class FileProcessor implements IFileProcessor {
       const pdfParse = await getPdfParse();
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
+
       const data = await pdfParse(buffer);
-      
+
       if (!data.text || data.text.trim().length === 0) {
         throw new FileProcessingError(
           'No text content found in PDF',
@@ -94,7 +94,7 @@ export class FileProcessor implements IFileProcessor {
           FileProcessingErrorCode.EMPTY_CONTENT
         );
       }
-      
+
       return data.text;
     } catch (error) {
       if (error instanceof FileProcessingError) {
@@ -116,9 +116,9 @@ export class FileProcessor implements IFileProcessor {
     try {
       const mammoth = await getMammoth();
       const arrayBuffer = await file.arrayBuffer();
-      
+
       const result = await mammoth.extractRawText({ arrayBuffer });
-      
+
       if (!result.value || result.value.trim().length === 0) {
         throw new FileProcessingError(
           'No text content found in DOCX',
@@ -126,7 +126,7 @@ export class FileProcessor implements IFileProcessor {
           FileProcessingErrorCode.EMPTY_CONTENT
         );
       }
-      
+
       return result.value;
     } catch (error) {
       if (error instanceof FileProcessingError) {
@@ -143,15 +143,48 @@ export class FileProcessor implements IFileProcessor {
 
   /**
    * Process image file using OCR
+   * Attempts to use Web Worker for better performance, falls back to main thread
    */
   async processImage(file: File): Promise<string> {
     try {
+      // Try using Web Worker for OCR (better performance)
+      if (typeof window !== 'undefined') {
+        try {
+          const { ocrWorkerManager } = await import('@/lib/workers/ocrWorker');
+
+          // Initialize if not ready
+          if (!ocrWorkerManager.isReady) {
+            const initialized = await ocrWorkerManager.initialize(this.config.ocrLanguage || 'eng');
+            if (!initialized) {
+              throw new Error('Worker initialization failed');
+            }
+          }
+
+          // Perform OCR in worker
+          const result = await ocrWorkerManager.recognize(file);
+
+          if (!result.text || result.text.trim().length === 0) {
+            throw new FileProcessingError(
+              'No text content found in image',
+              file.type,
+              FileProcessingErrorCode.EMPTY_CONTENT
+            );
+          }
+
+          return result.text;
+        } catch (workerError) {
+          console.warn('Web Worker OCR failed, falling back to main thread:', workerError);
+          // Fall through to main thread OCR
+        }
+      }
+
+      // Fallback: Main thread OCR for server-side or when worker fails
       const Tesseract = await getTesseract();
-      
+
       const result = await Tesseract.recognize(file, this.config.ocrLanguage || 'eng', {
-        logger: () => {}, // Suppress logs
+        logger: () => { }, // Suppress logs
       });
-      
+
       if (!result.data.text || result.data.text.trim().length === 0) {
         throw new FileProcessingError(
           'No text content found in image',
@@ -159,7 +192,7 @@ export class FileProcessor implements IFileProcessor {
           FileProcessingErrorCode.EMPTY_CONTENT
         );
       }
-      
+
       return result.data.text;
     } catch (error) {
       if (error instanceof FileProcessingError) {
@@ -180,7 +213,7 @@ export class FileProcessor implements IFileProcessor {
   async processText(file: File): Promise<string> {
     try {
       const text = await file.text();
-      
+
       if (!text || text.trim().length === 0) {
         throw new FileProcessingError(
           'Text file is empty',
@@ -188,7 +221,7 @@ export class FileProcessor implements IFileProcessor {
           FileProcessingErrorCode.EMPTY_CONTENT
         );
       }
-      
+
       return text;
     } catch (error) {
       if (error instanceof FileProcessingError) {
