@@ -84,13 +84,13 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       }, 1500);
     } catch (err) {
       console.error('Export error:', err);
-      
+
       if (err instanceof ExportError) {
         setError(`Export failed at ${err.stage}: ${err.message}`);
       } else {
         setError(err instanceof Error ? err.message : 'Failed to export PDF');
       }
-      
+
       setIsExporting(false);
       setProgress(null);
     }
@@ -139,7 +139,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
    */
   const getProgressMessage = (): string => {
     if (!progress) return '';
-    
+
     if (progress.message) {
       return progress.message;
     }
@@ -172,10 +172,9 @@ const ExportButton: React.FC<ExportButtonProps> = ({
           className={`
             flex-1 px-6 py-3 rounded-lg font-medium text-white
             transition-all duration-200
-            ${
-              isDisabled
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+            ${isDisabled
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-primary hover:bg-primary-hover active:scale-[0.98]'
             }
             ${isExporting ? 'cursor-wait' : ''}
           `}
@@ -229,12 +228,11 @@ const ExportButton: React.FC<ExportButtonProps> = ({
           onClick={toggleOptions}
           disabled={isExporting}
           className={`
-            px-4 py-3 rounded-lg font-medium border-2
+            px-4 py-3 rounded-lg font-medium border
             transition-all duration-200
-            ${
-              isExporting
-                ? 'border-gray-300 text-gray-400 cursor-not-allowed'
-                : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+            ${isExporting
+              ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+              : 'border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
             }
           `}
           title="Export options"
@@ -270,13 +268,12 @@ const ExportButton: React.FC<ExportButtonProps> = ({
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div
-              className={`h-full transition-all duration-300 ${
-                progress.stage === 'error'
+              className={`h-full transition-all duration-300 ${progress.stage === 'error'
                   ? 'bg-red-500'
                   : progress.stage === 'complete'
-                  ? 'bg-green-500'
-                  : 'bg-blue-600'
-              }`}
+                    ? 'bg-green-500'
+                    : 'bg-blue-600'
+                }`}
               style={{ width: `${progress.percentage}%` }}
             />
           </div>
@@ -336,10 +333,9 @@ const ExportButton: React.FC<ExportButtonProps> = ({
                 onClick={() => updateOption('format', 'a4')}
                 className={`
                   flex-1 px-4 py-2 rounded-lg border-2 transition-all
-                  ${
-                    exportOptions.format === 'a4'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  ${exportOptions.format === 'a4'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
                   }
                 `}
               >
@@ -349,10 +345,9 @@ const ExportButton: React.FC<ExportButtonProps> = ({
                 onClick={() => updateOption('format', 'letter')}
                 className={`
                   flex-1 px-4 py-2 rounded-lg border-2 transition-all
-                  ${
-                    exportOptions.format === 'letter'
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                  ${exportOptions.format === 'letter'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
                   }
                 `}
               >
