@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 interface ColorOption {
   name: string;
   hex: string;
-  category: 'classic' | 'ink' | 'creative';
+  category: 'classic' | 'ink' | 'vintage';
   description?: string;
 }
 
@@ -19,29 +19,27 @@ export default function ColorPickerDropdown({
   onColorChange
 }: ColorPickerDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<'all' | 'classic' | 'ink' | 'creative'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'classic' | 'ink' | 'vintage'>('all');
 
-  // Realistic ink colors organized by category
+  // Calm, realistic ink colors
   const colors: ColorOption[] = [
-    // Classic Pen Colors
-    { name: 'Black', hex: '#1a1a1a', category: 'classic', description: 'Standard black ink' },
-    { name: 'Dark Blue', hex: '#1e3a5f', category: 'classic', description: 'Classic ballpoint blue' },
-    { name: 'Royal Blue', hex: '#0047ab', category: 'classic', description: 'Traditional fountain pen blue' },
-    { name: 'Red', hex: '#c41e3a', category: 'classic', description: 'Teacher marking red' },
+    // Classic - everyday writing colors
+    { name: 'Black Ink', hex: '#1a1a1a', category: 'classic', description: 'Standard black' },
+    { name: 'Dark Blue', hex: '#1e3a5f', category: 'classic', description: 'Classic ballpoint' },
+    { name: 'Navy', hex: '#0a1929', category: 'classic', description: 'Deep formal blue' },
+    { name: 'Charcoal', hex: '#374151', category: 'classic', description: 'Soft graphite' },
 
-    // Fountain Pen Inks
-    { name: 'Midnight Blue', hex: '#003366', category: 'ink', description: 'Deep formal blue' },
-    { name: 'Navy', hex: '#0a1929', category: 'ink', description: 'Dark navy ink' },
-    { name: 'Burgundy', hex: '#722f37', category: 'ink', description: 'Rich wine red' },
-    { name: 'Forest Green', hex: '#1d4d2e', category: 'ink', description: 'Deep forest green' },
-    { name: 'Walnut Brown', hex: '#5c4033', category: 'ink', description: 'Vintage brown ink' },
-    { name: 'Sepia', hex: '#704214', category: 'ink', description: 'Classic sepia tone' },
+    // Fountain Pen Inks - rich, deep tones
+    { name: 'Midnight Blue', hex: '#003366', category: 'ink', description: 'Elegant blue' },
+    { name: 'Forest Green', hex: '#1d4d2e', category: 'ink', description: 'Deep green' },
+    { name: 'Burgundy', hex: '#722f37', category: 'ink', description: 'Rich wine' },
+    { name: 'Walnut', hex: '#5c4033', category: 'ink', description: 'Warm brown' },
 
-    // Creative Colors
-    { name: 'Violet', hex: '#5b21b6', category: 'creative', description: 'Rich purple ink' },
-    { name: 'Teal', hex: '#0d9488', category: 'creative', description: 'Ocean teal' },
-    { name: 'Coral', hex: '#dc2626', category: 'creative', description: 'Warm coral red' },
-    { name: 'Graphite', hex: '#374151', category: 'creative', description: 'Pencil-like gray' },
+    // Vintage - aged, faded tones
+    { name: 'Sepia', hex: '#704214', category: 'vintage', description: 'Antique brown' },
+    { name: 'Slate', hex: '#6b7280', category: 'vintage', description: 'Muted gray' },
+    { name: 'Plum', hex: '#5b3d5b', category: 'vintage', description: 'Soft purple' },
+    { name: 'Sage', hex: '#4a5d4a', category: 'vintage', description: 'Earthy green' },
   ];
 
   const filteredColors = activeCategory === 'all'
@@ -71,44 +69,40 @@ export default function ColorPickerDropdown({
   }, [isOpen]);
 
   const categoryLabels = {
-    all: { icon: '🎨', label: 'All Colors' },
-    classic: { icon: '✒️', label: 'Classic' },
-    ink: { icon: '🖋️', label: 'Fountain' },
-    creative: { icon: '✨', label: 'Creative' },
+    all: { label: 'All' },
+    classic: { label: 'Classic' },
+    ink: { label: 'Fountain' },
+    vintage: { label: 'Vintage' },
   };
 
   return (
     <div className="color-dropdown relative">
-      <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-        <span className="text-lg">🖊️</span>
-        Ink Color
+      <label className="label flex items-center gap-2">
+        <span>Ink Color</span>
       </label>
 
       {/* Dropdown Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl text-left flex items-center justify-between hover:border-blue-400 hover:shadow-md focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all group"
+        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
       >
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-xl shadow-md flex-shrink-0 ring-2 ring-white"
-            style={{
-              backgroundColor: selectedColor,
-              boxShadow: `0 4px 12px ${selectedColor}40`
-            }}
+            className="w-8 h-8 rounded-lg flex-shrink-0 border border-gray-200"
+            style={{ backgroundColor: selectedColor }}
           />
           <div>
-            <div className="text-sm font-semibold text-gray-900">
+            <div className="text-sm font-medium text-gray-800">
               {selectedColorOption.name}
             </div>
             <div className="text-xs text-gray-500">
-              {selectedColorOption.description || 'Selected ink color'}
+              {selectedColorOption.description}
             </div>
           </div>
         </div>
 
         <svg
-          className={`w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-all ${isOpen ? 'transform rotate-180' : ''}`}
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -119,53 +113,52 @@ export default function ColorPickerDropdown({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden animate-scale-in">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden animate-scale-in">
           {/* Category Tabs */}
-          <div className="px-2 py-2 border-b border-gray-100 bg-gray-50/50">
-            <div className="flex flex-wrap gap-1">
+          <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
+            <div className="flex gap-1">
               {(Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${activeCategory === cat
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${activeCategory === cat
+                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                    : 'text-gray-500 hover:text-gray-700'
                     }`}
                 >
-                  {categoryLabels[cat].icon} {categoryLabels[cat].label}
+                  {categoryLabels[cat].label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Color Grid */}
-          <div className="p-3 max-h-64 overflow-y-auto">
-            <div className="grid grid-cols-2 gap-2">
+          {/* Color List */}
+          <div className="p-2 max-h-56 overflow-y-auto">
+            <div className="space-y-1">
               {filteredColors.map((color) => (
                 <button
                   key={color.hex}
                   onClick={() => handleColorSelect(color)}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 ${selectedColor === color.hex ? 'bg-gradient-to-r from-blue-50 to-indigo-50 ring-2 ring-blue-400' : ''
+                  className={`w-full flex items-center gap-3 p-2.5 rounded-md transition-all ${selectedColor === color.hex
+                      ? 'bg-primary-light'
+                      : 'hover:bg-gray-50'
                     }`}
                 >
                   <div
-                    className="w-8 h-8 rounded-lg shadow-md flex-shrink-0 ring-2 ring-white"
-                    style={{
-                      backgroundColor: color.hex,
-                      boxShadow: `0 2px 8px ${color.hex}30`
-                    }}
+                    className="w-7 h-7 rounded-md flex-shrink-0 border border-gray-200"
+                    style={{ backgroundColor: color.hex }}
                   />
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-sm font-medium text-gray-900 truncate">
+                    <div className="text-sm font-medium text-gray-800">
                       {color.name}
                     </div>
-                    <div className="text-xs text-gray-400 font-mono">
-                      {color.hex.toUpperCase()}
+                    <div className="text-xs text-gray-400">
+                      {color.description}
                     </div>
                   </div>
 
                   {selectedColor === color.hex && (
-                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -174,12 +167,12 @@ export default function ColorPickerDropdown({
             </div>
           </div>
 
-          {/* Quick Preview */}
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
+          {/* Preview */}
+          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Preview:</span>
+              <span className="text-xs text-gray-500">Preview</span>
               <span
-                className="text-sm font-medium"
+                className="text-sm"
                 style={{ color: selectedColor, fontFamily: 'cursive' }}
               >
                 The quick brown fox...
