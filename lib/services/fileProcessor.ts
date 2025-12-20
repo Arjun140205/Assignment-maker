@@ -13,7 +13,14 @@ import {
 // Dynamic imports for heavy libraries
 const getPdfParse = async () => {
   const module = await import('pdf-parse');
-  return (module as any).default || module;
+  // pdf-parse exports default in CommonJS style
+  // In ESM context, it may be module.default or module itself
+  const pdfParse = (module as any).default ?? module;
+  // If pdfParse is still a module object with default, extract it
+  if (typeof pdfParse === 'object' && pdfParse.default) {
+    return pdfParse.default;
+  }
+  return pdfParse;
 };
 const getMammoth = () => import('mammoth');
 const getTesseract = () => import('tesseract.js');
