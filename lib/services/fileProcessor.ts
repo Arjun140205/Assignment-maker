@@ -11,18 +11,17 @@ import {
 } from '@/lib/types/file-processing';
 
 // Dynamic imports for heavy libraries
+// pdf-parse is a CommonJS module, use require in server context
 const getPdfParse = async () => {
-  const module = await import('pdf-parse');
-  // pdf-parse exports default in CommonJS style
-  // In ESM context, it may be module.default or module itself
-  const pdfParse = (module as any).default ?? module;
-  // If pdfParse is still a module object with default, extract it
-  if (typeof pdfParse === 'object' && pdfParse.default) {
-    return pdfParse.default;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const pdfParse = require('pdf-parse');
   return pdfParse;
 };
-const getMammoth = () => import('mammoth');
+const getMammoth = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mammoth = require('mammoth');
+  return mammoth;
+};
 const getTesseract = () => import('tesseract.js');
 
 /**
@@ -123,8 +122,9 @@ export class FileProcessor implements IFileProcessor {
     try {
       const mammoth = await getMammoth();
       const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
-      const result = await mammoth.extractRawText({ arrayBuffer });
+      const result = await mammoth.extractRawText({ buffer });
 
       if (!result.value || result.value.trim().length === 0) {
         throw new FileProcessingError(
