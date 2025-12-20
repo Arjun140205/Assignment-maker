@@ -16,20 +16,12 @@ interface FontSelectorDropdownProps {
   onFontChange: (font: HandwrittenFont) => void;
 }
 
-const CATEGORY_ICONS: Record<FontCategory, string> = {
-  natural: '✍️',
-  casual: '📝',
-  neat: '📖',
-  formal: '🖋️',
-  artistic: '🎨',
-};
-
-const CATEGORY_DESCRIPTIONS: Record<FontCategory, string> = {
-  natural: 'Everyday handwriting',
-  casual: 'Relaxed student style',
-  neat: 'Clear and legible',
-  formal: 'Elegant script',
-  artistic: 'Unique character',
+const CATEGORY_LABELS: Record<FontCategory, string> = {
+  natural: 'Natural',
+  casual: 'Casual',
+  neat: 'Neat',
+  formal: 'Formal',
+  artistic: 'Artistic',
 };
 
 export default function FontSelectorDropdown({
@@ -37,7 +29,6 @@ export default function FontSelectorDropdown({
   onFontChange
 }: FontSelectorDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [loadingFontId, setLoadingFontId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<FontCategory | 'all' | 'recommended'>('recommended');
   const [searchQuery, setSearchQuery] = useState('');
@@ -72,10 +63,7 @@ export default function FontSelectorDropdown({
     setLoadingFontId(font.id);
 
     try {
-      // Load the font
       await fontService.loadFont(font);
-
-      // Apply the font
       onFontChange(font);
       setIsOpen(false);
     } catch (error) {
@@ -105,8 +93,7 @@ export default function FontSelectorDropdown({
 
   return (
     <div className="font-dropdown relative">
-      <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-        <span className="text-lg">✍️</span>
+      <label className="label">
         Handwriting Style
       </label>
 
@@ -114,21 +101,21 @@ export default function FontSelectorDropdown({
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={loadingFontId !== null}
-        className="w-full px-4 py-3 bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl text-left flex items-center justify-between hover:border-blue-400 hover:shadow-md focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all disabled:opacity-50"
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-medium text-gray-800">
               {selectedFont.name}
             </span>
             {currentFontCategory && (
-              <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium capitalize">
+              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full capitalize">
                 {currentFontCategory}
               </span>
             )}
           </div>
           <div
-            className="text-sm text-gray-700 truncate mt-1.5 leading-relaxed"
+            className="text-sm text-gray-600 truncate mt-1"
             style={{ fontFamily: `"${selectedFont.family}", cursive` }}
           >
             {selectedFont.preview.substring(0, 35)}...
@@ -136,12 +123,10 @@ export default function FontSelectorDropdown({
         </div>
 
         {loadingFontId ? (
-          <div className="ml-3 flex-shrink-0">
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-          </div>
+          <div className="spinner ml-3 flex-shrink-0"></div>
         ) : (
           <svg
-            className={`ml-3 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-all ${isOpen ? 'transform rotate-180' : ''}`}
+            className={`ml-3 w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -153,9 +138,9 @@ export default function FontSelectorDropdown({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden animate-scale-in">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden animate-scale-in">
           {/* Search Input */}
-          <div className="p-3 border-b border-gray-100 bg-gray-50/50">
+          <div className="p-3 border-b border-gray-100 bg-gray-50">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -165,107 +150,95 @@ export default function FontSelectorDropdown({
                 placeholder="Search fonts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
+                className="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
               />
             </div>
           </div>
 
           {/* Category Tabs */}
-          <div className="px-2 py-2 border-b border-gray-100 bg-gray-50/30">
+          <div className="px-2 py-2 border-b border-gray-100 bg-gray-50">
             <div className="flex flex-wrap gap-1">
-              {/* Recommended Tab */}
               <button
                 onClick={() => setActiveCategory('recommended')}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${activeCategory === 'recommended'
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100'
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${activeCategory === 'recommended'
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
-                ⭐ Recommended
+                Recommended
               </button>
-              {/* All Tab */}
               <button
                 onClick={() => setActiveCategory('all')}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${activeCategory === 'all'
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100'
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${activeCategory === 'all'
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
-                All ({HANDWRITTEN_FONTS.length})
+                All
               </button>
-              {/* Category Tabs */}
               {categories.map((cat) => (
                 <button
                   key={cat.category}
                   onClick={() => setActiveCategory(cat.category)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${activeCategory === cat.category
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${activeCategory === cat.category
+                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                    : 'text-gray-500 hover:text-gray-700'
                     }`}
                 >
-                  {CATEGORY_ICONS[cat.category]} {cat.label}
+                  {CATEGORY_LABELS[cat.category]}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Font List */}
-          <div className="max-h-72 overflow-y-auto">
+          <div className="max-h-64 overflow-y-auto">
             {filteredFonts.length === 0 ? (
-              <div className="px-4 py-8 text-center text-gray-500">
-                <span className="text-2xl">🔍</span>
-                <p className="mt-2 text-sm">No fonts match your search</p>
+              <div className="px-4 py-6 text-center text-gray-500">
+                <p className="text-sm">No fonts match your search</p>
               </div>
             ) : (
-              filteredFonts.map((font) => (
-                <button
-                  key={font.id}
-                  onClick={() => handleFontSelect(font)}
-                  disabled={loadingFontId === font.id}
-                  className={`w-full px-4 py-3 text-left hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all border-b border-gray-50 last:border-b-0 disabled:opacity-50 ${selectedFont.id === font.id ? 'bg-gradient-to-r from-blue-50 to-indigo-50' : ''
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-900">
-                          {font.name}
-                        </span>
-                        <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded capitalize">
-                          {font.category}
-                        </span>
+              <div className="p-2 space-y-1">
+                {filteredFonts.map((font) => (
+                  <button
+                    key={font.id}
+                    onClick={() => handleFontSelect(font)}
+                    disabled={loadingFontId === font.id}
+                    className={`w-full px-3 py-2.5 rounded-md text-left transition-all disabled:opacity-50 ${selectedFont.id === font.id
+                        ? 'bg-primary-light'
+                        : 'hover:bg-gray-50'
+                      }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-800">
+                            {font.name}
+                          </span>
+                          <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded capitalize">
+                            {font.category}
+                          </span>
+                        </div>
+                        <div
+                          className="text-sm text-gray-600 truncate mt-1"
+                          style={{ fontFamily: `"${font.family}", cursive` }}
+                        >
+                          {font.preview.substring(0, 40)}
+                        </div>
                       </div>
-                      <div
-                        className="text-base text-gray-800 truncate mt-1.5"
-                        style={{ fontFamily: `"${font.family}", cursive` }}
-                      >
-                        {font.preview.substring(0, 45)}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{font.description}</p>
+
+                      {loadingFontId === font.id ? (
+                        <div className="spinner ml-3 flex-shrink-0"></div>
+                      ) : selectedFont.id === font.id ? (
+                        <svg className="ml-3 w-4 h-4 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      ) : null}
                     </div>
-
-                    {loadingFontId === font.id ? (
-                      <div className="ml-3 flex-shrink-0">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                      </div>
-                    ) : selectedFont.id === font.id ? (
-                      <svg className="ml-3 w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    ) : null}
-                  </div>
-                </button>
-              ))
+                  </button>
+                ))}
+              </div>
             )}
-          </div>
-
-          {/* Footer */}
-          <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50">
-            <p className="text-xs text-gray-500 text-center">
-              {activeCategory === 'recommended' ? '⭐ Best fonts for realistic handwriting' :
-                activeCategory === 'all' ? `${HANDWRITTEN_FONTS.length} fonts available` :
-                  CATEGORY_DESCRIPTIONS[activeCategory as FontCategory]}
-            </p>
           </div>
         </div>
       )}
